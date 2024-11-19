@@ -1,0 +1,48 @@
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - db  
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_URL=postgresql://postgres:password@db:5432/xberrytask  
+  redis:
+    image: redis:alpine
+
+  db:  
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: xberrytask
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  
+
+  celery_worker:
+    build: .
+    command: celery -A shortener_app.celery_tasks worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+
+  test:
+    build: .
+    command: ["pytest", "shortener_app/tests/test_main.py"]
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_URL=postgresql://postgres:password@db/xberrytask
+      - BASE_URL=http://localhost:8000 
+      - REDIS_BROKER_URL=redis://redis:6379/0
+      - REDIS_BACKEND_URL=redis://redis:6379/0
+
+volumes:
+  postgres_data:  

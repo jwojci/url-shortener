@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=q, initial-scale=1.0">
+    <title>xBerry</title>
+</head>
+<body>
+    <h1>URL Shortener</h1>
+    <form action="/shorten_url" method="post">
+        <label for="url">Enter URL to shorten:</label>
+        <input type="text" id="url" name="target_url" required>
+        <button type="submit">Shorten</button>
+    </form>
+
+    {% if short_url %}
+        <h2>Shortened URL:</h2>
+        <a href="{{ short_url }}">{{ short_url }}</a>
+    {% endif %}
+
+    {% if error %}
+    <h2 style="color: red;">Error:</h2>
+    <p>{{ error }}</p>
+    {% endif %} 
+</body>
+</html>
